@@ -21,7 +21,7 @@ namespace Bots
 
         public MyBot(CommandService service)
         {
-            _service = service;66
+            _service = service;
         }
 #endregion
 
