@@ -45,23 +45,32 @@ namespace Bots
         [Command("play", RunMode = RunMode.Async)]
         public async Task play()
         {
+
             if (urls2.First() != null)
             {
-                string url = urls2.ElementAt(1);
-                IVoiceChannel _channel = (Context.User as IVoiceState).VoiceChannel;
-                IAudioClient _client = await channel.ConnectAsync();
-                //client = _client;
-                //channel = _channel;
+                async Task _play()
+                {
+                    string url = urls2.ElementAt(1);
+                    IVoiceChannel _channel = (Context.User as IVoiceState).VoiceChannel;
+                    IAudioClient _client = await channel.ConnectAsync();
+                    //client = _client;
+                    //channel = _channel;
 
-                var output = CreateStream(url).StandardOutput.BaseStream;
-                var stream = client.CreatePCMStream(AudioApplication.Music, 128 * 1024);
-                output.CopyToAsync(stream);
-                stream.FlushAsync().ConfigureAwait(false);
+                    var output = CreateStream(url).StandardOutput.BaseStream;
+                    var stream = client.CreatePCMStream(AudioApplication.Music, 128 * 1024);
+                    output.CopyToAsync(stream);
+                    stream.FlushAsync().ConfigureAwait(false);
+                }
+
+                if (urls2.First() != null) _play();
             }
             else
             {
                 await ReplyAsync("You need to que songs before playing them.");
             }
+
+            }
+
 
         }
 
