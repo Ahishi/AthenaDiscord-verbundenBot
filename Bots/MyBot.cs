@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -13,12 +13,17 @@ namespace Bots
 {
     public class MyBot : ModuleBase
     {
+#region Vars
         private CommandService _service;
+        IAudioClient client;
+        IVoiceChannel channel;
+        public List<string> urls2;
 
         public MyBot(CommandService service)
         {
-            _service = service;
+            _service = service;66
         }
+#endregion
 
         private Process CreateStream(string url)
         {
@@ -38,15 +43,36 @@ namespace Bots
         }
 
         [Command("play", RunMode = RunMode.Async)]
-        public async Task play(string url)
+        public async Task play()
         {
-            IVoiceChannel channel = (Context.User as IVoiceState).VoiceChannel;
-            IAudioClient client = await channel.ConnectAsync();
+            if (urls2.First() != null)
+            {
+                string url = urls2.ElementAt(1);
+                IVoiceChannel _channel = (Context.User as IVoiceState).VoiceChannel;
+                IAudioClient _client = await channel.ConnectAsync();
+                //client = _client;
+                //channel = _channel;
 
-            var output = CreateStream(url).StandardOutput.BaseStream;
-            var stream = client.CreatePCMStream(AudioApplication.Music, 128 * 1024);
-            output.CopyToAsync(stream);
-            stream.FlushAsync().ConfigureAwait(false);
+                var output = CreateStream(url).StandardOutput.BaseStream;
+                var stream = client.CreatePCMStream(AudioApplication.Music, 128 * 1024);
+                output.CopyToAsync(stream);
+                stream.FlushAsync().ConfigureAwait(false);
+            }
+            else
+            {
+                await ReplyAsync("You need to que songs before playing them.");
+            }
+
+        }
+
+
+        [Command("que")]
+        [Summary("Que Music")]
+        [Alias("q")]
+        public async Task que(string url)
+        {
+            urls2.Add(url);
+            await ReplyAsync(Context.User.Username + " added " + url + " to the que!");
         }
 
         [Command("hello")]
@@ -70,12 +96,12 @@ namespace Bots
                 await ReplyAsync(echo);
             }
         }
-        
+
 
         [Command("purge")]
         [RequireBotPermission(GuildPermission.ManageMessages)]
         [RequireUserPermission(GuildPermission.ManageMessages)]
-        [Alias ("Exterminate!Exterminate! ", "delete")]
+        [Alias("Exterminate!Exterminate! ", "delete")]
         public async Task Purge([Remainder] int num = 0)
         {
             if (num <= 100)
@@ -132,7 +158,7 @@ namespace Bots
                         });
                     }
                 }
-                await ReplyAsync("", false, builder.Build());   
+                await ReplyAsync("", false, builder.Build());
             }
             else
             {
@@ -162,7 +188,7 @@ namespace Bots
                             $"Parameters: {string.Join(", ", cmd.Parameters.Select(p => p.Name))}\n";
                         x.IsInline = false;
                     });
-                       
+
                 }
                 await ReplyAsync("", false, builder.Build());
             }
@@ -183,6 +209,5 @@ namespace Bots
             }
 
         }
-        
     }
 }
