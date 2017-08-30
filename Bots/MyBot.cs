@@ -46,23 +46,29 @@ namespace Bots
         public async Task play()
         {
 
-            if (urls2.First() != null)
+            if (urls2.FirstOrDefault() != null)
             {
                 async Task _play()
                 {
-                    string url = urls2.ElementAt(1);
+                    string url = urls2.First();
+                    urls2.Remove(urls2.First());
                     IVoiceChannel _channel = (Context.User as IVoiceState).VoiceChannel;
-                    IAudioClient _client = await channel.ConnectAsync();
-                    //client = _client;
-                    //channel = _channel;
+                    channel = _channel;
+                    IAudioClient _client = await _channel.ConnectAsync();
+                    client = _client;
 
                     var output = CreateStream(url).StandardOutput.BaseStream;
-                    var stream = client.CreatePCMStream(AudioApplication.Music, 128 * 1024);
+                    var stream = _client.CreatePCMStream(AudioApplication.Music, 128 * 1024);
                     output.CopyToAsync(stream);
                     stream.FlushAsync().ConfigureAwait(false);
                 }
 
-                if (urls2.First() != null) _play();
+                if (urls2.FirstOrDefault() != null) _play();
+                else
+                {
+                    await ReplyAsync("Que finished, the bot will leave in 60secs, if no music is qued.");
+
+                }
             }
             else
             {
@@ -82,6 +88,20 @@ namespace Bots
         {
             urls2.Add(url);
             await ReplyAsync(Context.User.Username + " added " + url + " to the que!");
+        }
+
+        public async DiscTimer()
+        {
+        int i = 0;
+            for (urls2.First() != null; ;)
+            {
+            await Task.Delay(TimeSpan.FromSeconds(5));
+            i++;
+            if (12 <= i)
+            {
+                await channel.DisconnectAsync();
+            }
+            }
         }
 
         [Command("hello")]
